@@ -17,7 +17,7 @@ func CreateFork(name string) *Fork {
 	f.inputLeft = make(chan string)
 	f.outputLeft = make(chan string)
 	f.inputRight = make(chan string)
-	f.inputRight = make(chan string)
+	f.outputRight = make(chan string)
 	f.isOccupied = false
 	f.numUsed = 0
 	fmt.Println(name + "is created")
@@ -25,10 +25,11 @@ func CreateFork(name string) *Fork {
 }
 
 func work(f *Fork) {
-	fmt.Println(f.name + " work init")
-	f.outputLeft <- f.name + " left pick me up!"
-	<-f.inputLeft
-	f.outputRight <- f.name + " right pick me up!"
-	<-f.inputRight
-	fmt.Println(f.name + " done")
+	for {
+		f.outputRight <- f.name + " left pick me up!"
+		<-f.inputRight
+		f.outputLeft <- f.name + " right pick me up!"
+		<-f.inputLeft
+	}
+
 }

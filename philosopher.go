@@ -30,13 +30,10 @@ func CreatePhilosopher(name string, forkLeft, forkLeftIn, forkRight, forkRightIn
 
 func dine(p *Philosopher) {
 	for {
-		fmt.Println(p.name + " fork pickup started")
-		<-p.inputRight
-		p.outputRight <- "I picked up my left fork!"
-		fmt.Println(p.name + " picked up first fork")
 		<-p.inputLeft
-		p.outputLeft <- "I picked up my right fork!"
-		fmt.Println(p.name + " fork pickup done")
+		p.outputLeft <- "I picked up my left fork!"
+		<-p.inputRight
+		p.outputRight <- "I picked up my right fork!"
 		fmt.Println(p.name + "is eating")
 		//layForks(p)
 
