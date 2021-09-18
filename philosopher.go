@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type Philosopher struct {
 	inputLeft    chan string
@@ -24,7 +27,7 @@ func CreatePhilosopher(name string, forkLeft, forkLeftIn, forkRight, forkRightIn
 	p.hasLeftFork = false
 	p.hasRightFork = false
 	p.numEaten = 0
-	fmt.Println(name + "is created")
+	fmt.Println(name + " is created")
 	return &p
 }
 
@@ -34,8 +37,12 @@ func dine(p *Philosopher) {
 		p.outputLeft <- "I picked up my left fork!"
 		<-p.inputRight
 		p.outputRight <- "I picked up my right fork!"
-		fmt.Println(p.name + "is eating")
-		//layForks(p)
+		p.isEating = true
+		fmt.Println(p.name + " is eating")
+		sleepSeconds(1)
+		p.numEaten++
+		p.isEating = false
+		fmt.Println(p.name + " is done eating and has eaten " + strconv.Itoa(p.numEaten))
 
 	}
 }

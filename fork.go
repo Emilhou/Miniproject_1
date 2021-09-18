@@ -20,7 +20,7 @@ func CreateFork(name string) *Fork {
 	f.outputRight = make(chan string)
 	f.isOccupied = false
 	f.numUsed = 0
-	fmt.Println(name + "is created")
+	fmt.Println(name + " is created")
 	return &f
 }
 
