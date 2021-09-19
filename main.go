@@ -15,22 +15,7 @@ func main() {
 	createTable()
 	for {
 		time.Sleep(5 * time.Second)
-		var numQueries = 5
-		fmt.Println()
-		for i := 0; i < numQueries; i++ {
-			queryForkIN <- "Answer me!"
-			queryPhiloIN <- "Answer me!"
-		}
-		fmt.Println("****************************************************************************")
-		for i := 0; i < numQueries; i++ {
-			fmt.Println(<-queryPhiloOUT)
-		}
-		fmt.Println("----------------------------------------------------------------------------")
-		for i := 0; i < numQueries; i++ {
-			fmt.Println(<-queryForkOUT)
-		}
-		fmt.Println("****************************************************************************")
-		fmt.Println()
+		query()
 	}
 }
 
@@ -47,11 +32,11 @@ func createTable() {
 	forkThree := CreateFork("3", queryForkIN, queryForkOUT)
 	forkFour := CreateFork("4", queryForkIN, queryForkOUT)
 
-	demokritus := CreatePhilosopher("Demokritus", forkZero.outputRight, forkZero.inputRight, forkFour.outputLeft, forkFour.inputLeft, queryPhiloIN, queryPhiloOUT)
-	sokrates := CreatePhilosopher("Sokrates", forkOne.outputRight, forkOne.inputRight, forkZero.outputLeft, forkZero.inputLeft, queryPhiloIN, queryPhiloOUT)
-	platon := CreatePhilosopher("Platon", forkTwo.outputRight, forkTwo.inputRight, forkOne.outputLeft, forkOne.inputLeft, queryPhiloIN, queryPhiloOUT)
-	pythagoras := CreatePhilosopher("Pythagoras", forkThree.outputRight, forkThree.inputRight, forkTwo.outputLeft, forkTwo.inputLeft, queryPhiloIN, queryPhiloOUT)
-	aristoteles := CreatePhilosopher("Aristoteles", forkThree.outputLeft, forkThree.inputLeft, forkFour.outputRight, forkFour.inputRight, queryPhiloIN, queryPhiloOUT) // Left and right is swapped for this philosopher
+	demokritus := CreatePhilosopher("Demokritus", forkZero.outputRight, forkZero.inputRight, forkFour.outputLeft, forkFour.inputLeft, queryPhiloIN, queryPhiloOUT, forkZero, forkFour)
+	sokrates := CreatePhilosopher("Sokrates", forkOne.outputRight, forkOne.inputRight, forkZero.outputLeft, forkZero.inputLeft, queryPhiloIN, queryPhiloOUT, forkOne, forkZero)
+	platon := CreatePhilosopher("Platon", forkTwo.outputRight, forkTwo.inputRight, forkOne.outputLeft, forkOne.inputLeft, queryPhiloIN, queryPhiloOUT, forkTwo, forkOne)
+	pythagoras := CreatePhilosopher("Pythagoras", forkThree.outputRight, forkThree.inputRight, forkTwo.outputLeft, forkTwo.inputLeft, queryPhiloIN, queryPhiloOUT, forkThree, forkTwo)
+	aristoteles := CreatePhilosopher("Aristoteles", forkThree.outputLeft, forkThree.inputLeft, forkFour.outputRight, forkFour.inputRight, queryPhiloIN, queryPhiloOUT, forkThree, forkFour) // Left and right is swapped for this philosopher
 
 	go work(forkZero)
 	//time.Sleep(1 * time.Second)
@@ -62,7 +47,7 @@ func createTable() {
 	go work(forkThree)
 	//time.Sleep(1 * time.Second)
 	go work(forkFour)
-	//time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 	go dine(demokritus)
 	//time.Sleep(1 * time.Second)
 	go dine(sokrates)
@@ -77,6 +62,25 @@ func createTable() {
 	//fmt.Println("this is the end")
 }
 
-func sleepSeconds() {
+func sleepRandomSeconds() {
 	time.Sleep(time.Duration(rand.Intn(10)))
+}
+
+func query() {
+	var numQueries = 5
+	fmt.Println()
+	for i := 0; i < numQueries; i++ {
+		queryForkIN <- "Answer me!"
+		queryPhiloIN <- "Answer me!"
+	}
+	fmt.Println("****************************************************************************")
+	for i := 0; i < numQueries; i++ {
+		fmt.Println(<-queryPhiloOUT)
+	}
+	fmt.Println("----------------------------------------------------------------------------")
+	for i := 0; i < numQueries; i++ {
+		fmt.Println(<-queryForkOUT)
+	}
+	fmt.Println("****************************************************************************")
+	fmt.Println()
 }

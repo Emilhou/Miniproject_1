@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type Fork struct {
 	inputLeft, outputLeft, inputRight, outputRight chan string
@@ -8,6 +11,7 @@ type Fork struct {
 	isOccupied                                     bool
 	numUsed                                        int
 	name                                           string
+	mutex                                          sync.Mutex
 }
 
 func CreateFork(name string, queryIN, queryOUT chan string) *Fork {
@@ -29,6 +33,7 @@ func work(f *Fork) {
 	for {
 		f.outputRight <- f.name + " left pick me up!"
 		<-f.inputRight
+		f.numUsed++
 		f.outputLeft <- f.name + " right pick me up!"
 		<-f.inputLeft
 		f.numUsed++
@@ -38,9 +43,7 @@ func work(f *Fork) {
 
 func startQueryFork(f *Fork) {
 	for {
-		select {
-		case <-f.queryIN:
-			f.queryOUT <- fmt.Sprintf("Fork %s has been used %d times", f.name, f.numUsed)
-		}
+		<-f.queryIN
+		f.queryOUT <- fmt.Sprintf("Fork %s has been used %d times", f.name, f.numUsed)
 	}
 }
