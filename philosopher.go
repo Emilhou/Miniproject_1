@@ -2,27 +2,26 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type Philosopher struct {
-	inputLeft    chan string
-	outputLeft   chan string
-	inputRight   chan string
-	outputRight  chan string
-	isEating     bool
-	hasRightFork bool
-	hasLeftFork  bool
-	numEaten     int
-	name         string
+	inputLeft, outputLeft, inputRight, outputRight chan string
+	queryIN, queryOUT                              chan string
+	isEating                                       bool
+	hasRightFork                                   bool
+	hasLeftFork                                    bool
+	numEaten                                       int
+	name                                           string
 }
 
-func CreatePhilosopher(name string, forkLeft, forkLeftIn, forkRight, forkRightIn chan string) *Philosopher {
+func CreatePhilosopher(name string, forkLeft, forkLeftIn, forkRight, forkRightIn, queryIN, queryOUT chan string) *Philosopher {
 	p := Philosopher{name: name}
 	p.inputLeft = forkLeft
 	p.outputLeft = forkLeftIn
 	p.inputRight = forkRight
 	p.outputRight = forkRightIn
+	p.queryIN = queryIN
+	p.queryOUT = queryOUT
 	p.isEating = false
 	p.hasLeftFork = false
 	p.hasRightFork = false
@@ -32,22 +31,29 @@ func CreatePhilosopher(name string, forkLeft, forkLeftIn, forkRight, forkRightIn
 }
 
 func dine(p *Philosopher) {
+	go startQueryPhilosopher(p)
 	for {
 		<-p.inputLeft
 		p.outputLeft <- "I picked up my left fork!"
 		<-p.inputRight
 		p.outputRight <- "I picked up my right fork!"
 		p.isEating = true
-		fmt.Println(p.name + " is eating")
-		sleepSeconds(1)
+		//fmt.Println(p.name + " is eating")
 		p.numEaten++
+		sleepSeconds()
+
 		p.isEating = false
-		fmt.Println(p.name + " is done eating and has eaten " + strconv.Itoa(p.numEaten))
+		//fmt.Println(p.name + " is done eating and has eaten " + strconv.Itoa(p.numEaten))
 
 	}
 }
 
-func layForks(p *Philosopher) {
-	p.outputLeft <- "I´m done with my left fork!"
-	p.outputRight <- "I´m done with my right fork!"
+func startQueryPhilosopher(p *Philosopher) {
+	for {
+		select {
+		case <-p.queryIN:
+			p.queryOUT <- fmt.Sprintf("%s has eaten %d times", p.name, p.numEaten)
+		}
+
+	}
 }

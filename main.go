@@ -2,29 +2,56 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
+
+var queryForkIN chan string
+var queryForkOUT chan string
+var queryPhiloIN chan string
+var queryPhiloOUT chan string
 
 func main() {
 	createTable()
 	for {
-		continue
+		time.Sleep(5 * time.Second)
+		var numQueries = 5
+		fmt.Println()
+		for i := 0; i < numQueries; i++ {
+			queryForkIN <- "Answer me!"
+			queryPhiloIN <- "Answer me!"
+		}
+		fmt.Println("****************************************************************************")
+		for i := 0; i < numQueries; i++ {
+			fmt.Println(<-queryPhiloOUT)
+		}
+		fmt.Println("----------------------------------------------------------------------------")
+		for i := 0; i < numQueries; i++ {
+			fmt.Println(<-queryForkOUT)
+		}
+		fmt.Println("****************************************************************************")
+		fmt.Println()
 	}
 }
 
 func createTable() {
-	fmt.Println("this is the start")
-	forkZero := CreateFork("0")
-	forkOne := CreateFork("1")
-	forkTwo := CreateFork("2")
-	forkThree := CreateFork("3")
-	forkFour := CreateFork("4")
+	queryForkIN = make(chan string, 5)
+	queryForkOUT = make(chan string, 5)
+	queryPhiloIN = make(chan string, 5)
+	queryPhiloOUT = make(chan string, 5)
 
-	demokritus := CreatePhilosopher("Demokritus", forkZero.outputRight, forkZero.inputRight, forkFour.outputLeft, forkFour.inputLeft)
-	sokrates := CreatePhilosopher("Sokrates", forkOne.outputRight, forkOne.inputRight, forkZero.outputLeft, forkZero.inputLeft)
-	platon := CreatePhilosopher("Platon", forkTwo.outputRight, forkTwo.inputRight, forkOne.outputLeft, forkOne.inputLeft)
-	pythagoras := CreatePhilosopher("Pythagoras", forkThree.outputRight, forkThree.inputRight, forkTwo.outputLeft, forkTwo.inputLeft)
-	aristoteles := CreatePhilosopher("Aristoteles", forkThree.outputLeft, forkThree.inputLeft, forkFour.outputRight, forkFour.inputRight) // Left and right is swapped for this philosopher
+	//fmt.Println("this is the start")
+	forkZero := CreateFork("0", queryForkIN, queryForkOUT)
+	forkOne := CreateFork("1", queryForkIN, queryForkOUT)
+	forkTwo := CreateFork("2", queryForkIN, queryForkOUT)
+	forkThree := CreateFork("3", queryForkIN, queryForkOUT)
+	forkFour := CreateFork("4", queryForkIN, queryForkOUT)
+
+	demokritus := CreatePhilosopher("Demokritus", forkZero.outputRight, forkZero.inputRight, forkFour.outputLeft, forkFour.inputLeft, queryPhiloIN, queryPhiloOUT)
+	sokrates := CreatePhilosopher("Sokrates", forkOne.outputRight, forkOne.inputRight, forkZero.outputLeft, forkZero.inputLeft, queryPhiloIN, queryPhiloOUT)
+	platon := CreatePhilosopher("Platon", forkTwo.outputRight, forkTwo.inputRight, forkOne.outputLeft, forkOne.inputLeft, queryPhiloIN, queryPhiloOUT)
+	pythagoras := CreatePhilosopher("Pythagoras", forkThree.outputRight, forkThree.inputRight, forkTwo.outputLeft, forkTwo.inputLeft, queryPhiloIN, queryPhiloOUT)
+	aristoteles := CreatePhilosopher("Aristoteles", forkThree.outputLeft, forkThree.inputLeft, forkFour.outputRight, forkFour.inputRight, queryPhiloIN, queryPhiloOUT) // Left and right is swapped for this philosopher
 
 	go work(forkZero)
 	//time.Sleep(1 * time.Second)
@@ -47,9 +74,9 @@ func createTable() {
 	go dine(aristoteles)
 	//time.Sleep(1 * time.Second)
 
-	fmt.Println("this is the end")
+	//fmt.Println("this is the end")
 }
 
-func sleepSeconds(i time.Duration) {
-	time.Sleep(i * time.Second)
+func sleepSeconds() {
+	time.Sleep(time.Duration(rand.Intn(10)))
 }
