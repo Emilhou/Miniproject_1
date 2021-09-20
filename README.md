@@ -1,3 +1,3 @@
 # Miniproject_1
 
-krbj, imag, ehou
+krbj, imag, sgun, ehou
