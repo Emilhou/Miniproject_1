@@ -40,8 +40,6 @@ func CreateTable() {
 	go Work(forkThree)
 	go Work(forkFour)
 
-	//time.Sleep(1*time.Second)
-
 	go Dine(philoZero)
 	go Dine(philoOne)
 	go Dine(philoTwo)
