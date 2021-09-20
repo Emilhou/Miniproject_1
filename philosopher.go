@@ -31,19 +31,33 @@ func Dine(p *Philosopher) {
 
 		p.leftFork.input <- "This fork is in use now"
 		p.rightFork.input <- "This fork is in use now"
-		<-p.leftFork.output
-		<-p.rightFork.output
-
-		p.isEating = true
-		p.numEaten++
-
-		SleepRandomSeconds()
-
-		p.isEating = false
-		p.leftFork.isOccupied = false
-		p.rightFork.isOccupied = false
+		left := <-p.leftFork.output
+		right := <-p.rightFork.output
+		if(!left && !right){
+			p.isEating = true;
+			p.leftFork.isOccupied = true
+			p.rightFork.isOccupied = true
+			p.leftFork.numUsed++
+			p.rightFork.numUsed++
+		}else {
+			mutex.Unlock()
+			continue
+		}
 
 		mutex.Unlock()
+
+		SleepRandomSeconds()
+		
+		if(p.isEating){
+			mutex.Lock()
+			p.numEaten++
+			p.isEating = false
+			p.leftFork.isOccupied = false
+			p.rightFork.isOccupied = false
+			mutex.Unlock()
+		}
+
+		SleepRandomSeconds()
 	}
 }
 

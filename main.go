@@ -1,10 +1,9 @@
 package main
 
-
-import( 
+import (
 	"fmt"
-	"sync"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -55,7 +54,7 @@ func SleepRandomSeconds(){
 	rand.Seed(time.Now().UnixNano())
 	var n  = rand.Intn(5)
 
-	time.Sleep(time.Duration(n) * time.Second)
+	time.Sleep(time.Duration(n) * time.Millisecond)
 
 }
 

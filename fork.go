@@ -26,8 +26,6 @@ func Work(f *Fork) {
 	for {
 		select {
 		case <-f.input:
-			f.numUsed++
-			f.isOccupied = true;
 			f.output <- f.isOccupied
 		}
 	}
